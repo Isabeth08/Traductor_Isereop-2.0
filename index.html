@@ -414,26 +414,34 @@ function traducirAutomatico(){
 function detectarIdioma(texto){
     texto = texto.toLowerCase();
 
-    // 1. Caracteres especiales del idioma
-    let caracteresRaros = /[ąęįǫųy̨åe̊i̊o̊ůẙⱥɇɨøʉɏâêîôûŷ]/;
+    let palabras = texto.split(/\s+/);
 
-    // 2. Patrones comunes del idioma de la Reina
-    let patronesReina = /(dm|qm|gm|hm|hs|dj|cs|cm|qs|ds|gs|fs|vs)/;
-
-    // 3. Palabras clave del idioma
-    let palabrasReina = ["rŷo", "fûpfi", "dŷepfu", "mut", "pu", "em"];
+    // letras poco comunes en español
+    let patronRaro = /[ⱥɇɨøʉɏåůŷ̂]/;
 
     let scoreReina = 0;
 
-    if(caracteresRaros.test(texto)) scoreReina += 2;
-    if(patronesReina.test(texto)) scoreReina += 1;
+    // lista de palabras comunes en español
+    let comunesES = ["el","la","los","las","un","una","de","que","y","en","a","es","no","se","por","con","su","para","como"];
 
-    palabrasReina.forEach(p => {
-        if(texto.includes(p)) scoreReina += 2;
+    palabras.forEach(p => {
+        if(patronRaro.test(p)){
+            scoreReina += 3;
+        }
+
+        // si la palabra NO está en español, suma punto
+        if(!comunesES.includes(p)){
+            scoreReina += 1;
+        }
+
+        // patrones raros
+        if(/(qw|qs|qy|ry|dy|ou|iw)/.test(p)){
+            scoreReina += 1;
+        }
     });
 
-    // Si suma suficiente, es idioma Reina
-    return scoreReina >= 2 ? "isereop" : "espanol";
+    // si la mayoría parece rara → idioma Reina
+    return scoreReina >= palabras.length ? "isereop" : "espanol";
 }
 document.getElementById("entrada").addEventListener("input", traducirAutomatico);
 
