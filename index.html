@@ -397,11 +397,24 @@ function invertir(){
 }
 
 function traducirAutomatico(){
-    if(modo === "es-a-isereop"){
-        aReina();
-    } else {
+    let texto = document.getElementById("entrada").value;
+
+    let idioma = detectarIdioma(texto);
+
+    if(idioma === "isereop"){
+        modo = "isereop-a-es";
         aEspanol();
+    } else {
+        modo = "es-a-isereop";
+        aReina();
     }
+}
+    
+function detectarIdioma(texto){
+    // caracteres únicos del idioma Isereop
+    let patronIsereop = /[ⱥɇɨøʉɏåů]/;
+
+    return patronIsereop.test(texto) ? "isereop" : "espanol";
 }
 
 document.getElementById("entrada").addEventListener("input", traducirAutomatico);
