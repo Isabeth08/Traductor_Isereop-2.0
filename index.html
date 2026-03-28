@@ -161,7 +161,8 @@ const diccionario = {
     "mas":"nęt",
     "alice":"alice",
     "lucifer":"lucifer",
-    "dios":"dios"
+    "dios":"dios",
+    "al":"em"
 };
 
 const preguntas = {
@@ -411,12 +412,29 @@ function traducirAutomatico(){
 }
     
 function detectarIdioma(texto){
-    // caracteres únicos del idioma Isereop
-    let patronIsereop = /[ⱥɇɨøʉɏåů]/;
+    texto = texto.toLowerCase();
 
-    return patronIsereop.test(texto) ? "isereop" : "espanol";
+    // 1. Caracteres especiales del idioma
+    let caracteresRaros = /[ąęįǫųy̨åe̊i̊o̊ůẙⱥɇɨøʉɏâêîôûŷ]/;
+
+    // 2. Patrones comunes del idioma de la Reina
+    let patronesReina = /(dm|qm|gm|hm|hs|dj|cs|cm|qs|ds|gs|fs|vs)/;
+
+    // 3. Palabras clave del idioma
+    let palabrasReina = ["rŷo", "fûpfi", "dŷepfu", "mut", "pu", "em"];
+
+    let scoreReina = 0;
+
+    if(caracteresRaros.test(texto)) scoreReina += 2;
+    if(patronesReina.test(texto)) scoreReina += 1;
+
+    palabrasReina.forEach(p => {
+        if(texto.includes(p)) scoreReina += 2;
+    });
+
+    // Si suma suficiente, es idioma Reina
+    return scoreReina >= 2 ? "isereop" : "espanol";
 }
-
 document.getElementById("entrada").addEventListener("input", traducirAutomatico);
 
 </script>
