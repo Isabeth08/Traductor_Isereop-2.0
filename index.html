@@ -32,12 +32,14 @@ textarea {
     width: 100%;
     height: 120px;
     padding: 10px;
-    font-family: Arial, sans-serif; /* 👈 CAMBIO IMPORTANTE */
+    font-family: Arial, sans-serif;
     font-size: 14px;
     border-radius: 10px;
     border: none;
     resize: none;
-    box-sizing: border-box; /* 👈 MUY IMPORTANTE */
+    box-sizing: border-box;
+    background: #121212;
+    color: #e0e0e0;
 }
 .botones {
     display: flex;
@@ -174,18 +176,25 @@ function detectarIdioma(texto){
 
     let palabras = texto.split(/\s+/);
 
-    let comunesES = ["el","la","de","que","y","en","a","es","no"];
+    let comunesES = ["el","la","de","que","y","en","a","es","no","mi","tu","yo","pero","como","para"];
     let raro = /[ⱥɇɨøʉɏåŷ]/;
 
-    let score = 0;
+    let scoreIsereop = 0;
+    let scoreEspanol = 0;
 
     palabras.forEach(p=>{
-        if(raro.test(p)) score += 3;
-        if(!comunesES.includes(p)) score += 1;
-        if(/(qy|ry|dy|ou|iw)/.test(p)) score += 1;
+        if(raro.test(p)) scoreIsereop += 3;
+        if(/(qy|ry|dy|ou|iw)/.test(p)) scoreIsereop += 1;
+
+        if(comunesES.includes(p)) scoreEspanol += 2;
     });
 
-    return score >= palabras.length ? "isereop" : "espanol";
+    // 🔥 DECISIÓN
+    if(scoreIsereop > scoreEspanol){
+        return "isereop";
+    } else {
+        return "espanol";
+    }
 }
 
 // =======================
@@ -303,37 +312,6 @@ function traducirAutomatico(){
     }
 }
 
-function detectarIdioma(texto){
-    texto = texto.toLowerCase();
-
-    // Palabras comunes en español
-    const palabrasEspanol = [
-        "el","la","de","que","y","en","un","ser","se","no",
-        "haber","por","con","su","para","como","estar","tener",
-        "le","lo","todo","pero","más","hacer","o","poder"
-    ];
-
-    let contador = 0;
-
-    palabrasEspanol.forEach(palabra => {
-        if(texto.includes(" " + palabra + " ") || texto.startsWith(palabra + " ")){
-            contador++;
-        }
-    });
-
-    // También detectar acentos
-    if(/[áéíóúñ]/.test(texto)){
-        return "es";
-    }
-
-    // Si hay varias palabras comunes → español
-    if(contador >= 3){
-        return "es";
-    }
-
-    return "isereop";
-}
-
 // =======================
 // 🔧 EXTRA
 // =======================
@@ -348,10 +326,14 @@ function limpiar(){
 }
 
 function invertir(){
-    let t=entrada.value;
-    entrada.value=salida.value;
-    salida.value=t;
-    traducirAutomatico();
+    let t = entrada.value;
+    entrada.value = salida.value;
+    salida.value = t;
+
+    // 🔥 SOLO traducir si hay texto
+    if(entrada.value.trim() !== ""){
+        traducirAutomatico();
+    }
 }
 
 function toggleModo(){
