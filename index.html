@@ -303,6 +303,37 @@ function traducirAutomatico(){
     }
 }
 
+function detectarIdioma(texto){
+    texto = texto.toLowerCase();
+
+    // Palabras comunes en español
+    const palabrasEspanol = [
+        "el","la","de","que","y","en","un","ser","se","no",
+        "haber","por","con","su","para","como","estar","tener",
+        "le","lo","todo","pero","más","hacer","o","poder"
+    ];
+
+    let contador = 0;
+
+    palabrasEspanol.forEach(palabra => {
+        if(texto.includes(" " + palabra + " ") || texto.startsWith(palabra + " ")){
+            contador++;
+        }
+    });
+
+    // También detectar acentos
+    if(/[áéíóúñ]/.test(texto)){
+        return "es";
+    }
+
+    // Si hay varias palabras comunes → español
+    if(contador >= 3){
+        return "es";
+    }
+
+    return "isereop";
+}
+
 // =======================
 // 🔧 EXTRA
 // =======================
