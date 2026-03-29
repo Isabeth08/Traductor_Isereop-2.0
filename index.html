@@ -6,7 +6,6 @@
 
 <link rel="icon" href="icono.png">
 <link rel="apple-touch-icon" href="icono.png">
-    
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -20,8 +19,6 @@ body {
     align-items: center;
     height: 100vh;
 }
-
-/* CONTENEDOR */
 .app {
     width: 90%;
     max-width: 500px;
@@ -29,17 +26,7 @@ body {
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 0 30px rgba(0,0,0,0.6);
-    backdrop-filter: blur(10px);
 }
-
-/* TÍTULO */
-h1 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-/* TEXTAREA */
 textarea {
     width: 100%;
     height: 90px;
@@ -50,126 +37,65 @@ textarea {
     padding: 12px;
     margin: 10px 0;
     font-size: 14px;
-    resize: none;
-    transition: 0.25s;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
 }
-
-textarea::placeholder {
-    color: #666;
-}
-
-textarea:focus {
-    outline: none;
-    border-color: #ba0000;
-    box-shadow: 0 0 0 2px rgba(255,42,42,0.2);
-}
-
-/* BOTONES */
 .botones {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
-    justify-content: center;
 }
-
 button {
     flex: 1;
-    min-width: 120px;
     background: #1a1a1a;
     color: white;
     border: none;
     border-radius: 10px;
     padding: 10px;
     cursor: pointer;
-    transition: 0.2s;
 }
-
 button:hover {
     background: #ba0000;
-    transform: translateY(-2px);
 }
-
-/* ANIMACIÓN */
-.loading {
-    opacity: 0.5;
-    position: relative;
-}
-
-.loading::after {
-    content: "Traduciendo...";
-    position: absolute;
-    right: 10px;
-    bottom: 5px;
-    font-size: 12px;
-    color: #ba0000;
-}
-
-/* MODO CLARO */
-.light {
-    background: linear-gradient(135deg, #f5f5f5, #dddddd);
-    color: black;
-}
-
-.light .app {
-    background: white;
-    color: black;
-}
-
-.light textarea {
-    background: #f0f0f0;
-    color: black;
-}
+.loading { opacity: 0.5; }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
-<h1>🐺👑Traductor de Isereop-Español🦌👤</h1>
+<h1>🐺👑Traductor Isereop🦌👤</h1>
 
 <textarea id="entrada" placeholder="Escribe aquí..."></textarea>
 
 <div class="botones">
-<button onclick="invertir()">Isereop ↔ Español</button>
+<button onclick="invertir()">Invertir</button>
 <button onclick="copiar()">Copiar</button>
 <button onclick="limpiar()">Limpiar</button>
-<button onclick="toggleModo()">Oscuro ↔ Claro</button>
 </div>
 
 <textarea id="salida"></textarea>
 
-<div id="historial"></div>
-
-<audio id="sonido">
-<source src="https://www.myinstants.com/media/sounds/keyboard-single-click.mp3">
-</audio>
-
 <script>
 
 // =======================
-// 🔥 DETECTOR INTELIGENTE REAL
+// 🔥 DETECTOR INTELIGENTE
 // =======================
 function detectarIdioma(texto){
     texto = texto.toLowerCase().trim();
 
-    if(texto.startsWith("Et-") && texto.endsWith("-te")){
+    if(texto.startsWith("et-") && texto.endsWith("-te")){
         return "isereop";
     }
 
     let palabras = texto.split(/\s+/);
 
-    let comunesES = ["el","la","los","las","un","una","de","que","y","en","a","es","no","se","por","con","su","para","como"];
-    let patronRaro = /[ⱥɇɨøʉɏåe̊i̊o̊ůẙŷ]/;
+    let comunesES = ["el","la","de","que","y","en","a","es","no"];
+    let raro = /[ⱥɇɨøʉɏåŷ]/;
 
     let score = 0;
 
-    palabras.forEach(p => {
-        if(patronRaro.test(p)) score += 3;
+    palabras.forEach(p=>{
+        if(raro.test(p)) score += 3;
         if(!comunesES.includes(p)) score += 1;
-        if(/(qy|qs|ry|dy|ou|iw)/.test(p)) score += 1;
+        if(/(qy|ry|dy|ou|iw)/.test(p)) score += 1;
     });
 
     return score >= palabras.length ? "isereop" : "espanol";
@@ -178,202 +104,100 @@ function detectarIdioma(texto){
 // =======================
 // 🔤 BASE
 // =======================
-const vocales = "aeiouy";
-const consonantes = "bcdfghjklmnpqrstvwxyz";
-    
-const diccionario = {
+const vocales="aeiouy";
+const consonantes="bcdfghjklmnpqrstvwxyz";
+
+// =======================
+// 📚 DICCIONARIO
+// =======================
+const diccionario={
     "esta":"itve",
-    "ahi":"ejǫ",
-    "aqui":"eryǫ",
-    "alguien":"emhyoip",
-    "confianza":"dupgoepbe",
-    "mas":"nęt",
-    "alice":"alice",
-    "lucifer":"lucifer",
-    "dios":"dios",
-    "pingüino":"qophÿopu",
-    "vergüenza":"wishÿipbe",
-    "antigüedad":"epsohÿifef"
+    "alguien":"emhyoip"
 };
-const preguntas = {
+
+// =======================
+// ❓ PREGUNTAS
+// =======================
+const preguntas={
     "quien":"rŷoip",
-    "que":"rŷi",
-    "donde":"fûpfi",
-    "cuando":"dŷepfu",
-    "cual":"dŷem",
-    "como":"dûnu"
+    "que":"rŷi"
 };
+
+const preguntasInv=Object.fromEntries(
+    Object.entries(preguntas).map(([k,v])=>[v,k])
+);
+
+// =======================
+// ⏳ TIEMPOS
+// =======================
+const pasado={"a":"ⱥ","e":"ɇ","i":"ɨ","o":"ø","u":"ʉ","y":"ɏ"};
+const pasadoInv={"ⱥ":"a","ɇ":"e","ɨ":"i","ø":"o","ʉ":"u","ɏ":"y"};
+
+const futuro={"a":"å","e":"e̊","i":"i̊","o":"o̊","u":"ů","y":"ẙ"};
+const futuroInv={"å":"a","e̊":"e","i̊":"i","o̊":"o","ů":"u","ẙ":"y"};
 
 // =======================
 // 🔁 LETRAS
 // =======================
 function moverLetra(l){
-    if(vocales.includes(l)){
-        let i = vocales.indexOf(l);
-        return vocales[(i+1)%vocales.length];
-    }
-    if(consonantes.includes(l)){
-        let i = consonantes.indexOf(l);
-        return consonantes[(i+1)%consonantes.length];
-    }
+    if(vocales.includes(l)) return vocales[(vocales.indexOf(l)+1)%6];
+    if(consonantes.includes(l)) return consonantes[(consonantes.indexOf(l)+1)%21];
     return l;
 }
 
 function revertirLetra(l){
-    if(vocales.includes(l)){
-        let i = vocales.indexOf(l);
-        return vocales[(i-1+vocales.length)%vocales.length];
-    }
-    if(consonantes.includes(l)){
-        let i = consonantes.indexOf(l);
-        return consonantes[(i-1+consonantes.length)%consonantes.length];
-    }
+    if(vocales.includes(l)) return vocales[(vocales.indexOf(l)-1+6)%6];
+    if(consonantes.includes(l)) return consonantes[(consonantes.indexOf(l)-1+21)%21];
     return l;
 }
 
 // =======================
-// ⏳ TIEMPOS
+// 👑 TRADUCIR
 // =======================
-function aplicarPasado(palabra){
-    for(let i=0;i<palabra.length;i++){
-        if("aeiouy".includes(palabra[i])){
-            return palabra.slice(0,i)+pasado[palabra[i]]+palabra.slice(i+1);
-        }
-    }
-    return palabra;
-}
-
-function aplicarFuturo(palabra){
-    for(let i=palabra.length-1;i>=0;i--){
-        if("aeiouy".includes(palabra[i])){
-            return palabra.slice(0,i)+futuro[palabra[i]]+palabra.slice(i+1);
-        }
-    }
-    return palabra;
-}
-
-// =======================
-// 👑 ESPAÑOL → ISEREOP
-// =======================
-function traducirPalabraReina(palabra){
-
-    let match = palabra.match(/^([a-záéíóúñ]+)([^a-záéíóú]*)$/i);
-    let baseOriginal = match ? match[1] : palabra;
-    let puntuacion = match ? match[2] : "";
-
-    let tiempo = "normal";
-
-    if (/(ó|í)$/.test(baseOriginal)) tiempo = "pasado";
-    else if (/(é|á|án|ás)$/.test(baseOriginal)) tiempo = "futuro";
-
-    let base = baseOriginal.toLowerCase().normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .normalize("NFC");
-
-    if (preguntas[base]) return preguntas[base] + puntuacion;
-    if (diccionario[base]) return diccionario[base] + puntuacion;
-
-    let traducida = "";
-    for (let c of base) traducida += moverLetra(c);
-
-    if (base.endsWith("mana")){
-        traducida = traducida.slice(0,-4) + "nepa";
-    }
-
-    if (tiempo === "pasado") traducida = aplicarPasado(traducida);
-    else if (tiempo === "futuro") traducida = aplicarFuturo(traducida);
-
-    return traducida + puntuacion;
-}
-
 function aReina(){
-    let texto = document.getElementById("entrada").value.toLowerCase();
+    let texto=entrada.value.toLowerCase();
+    let esPregunta=texto.startsWith("¿")&&texto.endsWith("?");
 
-    let esPregunta = texto.startsWith("¿") && texto.endsWith("?");
+    texto=texto.replace(/[¿?]/g,"");
 
-    texto = texto.replace("¿","").replace("?","");
+    let resultado=texto.split(" ").map(p=>{
+        if(diccionario[p]) return diccionario[p];
+        if(preguntas[p]) return preguntas[p];
 
-    let palabras = texto.split(/\s+/);
-    let resultado = palabras.map(p => traducirPalabraReina(p)).join(" ");
+        return [...p].map(moverLetra).join("");
+    }).join(" ");
 
-    if (esPregunta) resultado = "Et-" + resultado + "-te";
+    if(esPregunta) resultado="Et-"+resultado+"-te";
 
-    document.getElementById("salida").value = resultado;
-    animarSalida();
-}
-
-// =======================
-// 🔁 ISEREOP → ESPAÑOL
-// =======================
-function traducirPalabraEspanol(palabra){
-
-    palabra = palabra.toLowerCase();
-
-    let match = palabra.match(/^([a-zɨⱥɇøʉɏåe̊i̊o̊ůẙ]+)([^a-zɨⱥɇøʉɏåe̊i̊o̊ůẙ]*)$/i);
-    let base = match ? match[1] : palabra;
-    let puntuacion = match ? match[2] : "";
-
-    if (preguntasInv[base]) return preguntasInv[base] + puntuacion;
-
-    let tiempo = "normal";
-
-    if (/[ⱥɇɨøʉɏ]/.test(base)) tiempo = "pasado";
-    else if (/(å|e̊|i̊|o̊|ů|ẙ)/.test(base)) tiempo = "futuro";
-
-    if (base.endsWith("nepa")){
-        let raiz = base.slice(0,-4);
-        let limpio = "";
-        for (let c of raiz) limpio += revertirLetra(c);
-        return limpio + "mana" + puntuacion;
-    }
-
-    if (tiempo === "pasado"){
-        base = base.replace(/[ⱥɇɨøʉɏ]/g, m => pasadoInv[m]);
-    } else if (tiempo === "futuro"){
-        base = base.replace(/å|e̊|i̊|o̊|ů|ẙ/g, m => futuroInv[m]);
-    }
-
-    let original = "";
-    for (let c of base) original += revertirLetra(c);
-
-    if (tiempo === "pasado"){
-        if (original.endsWith("io")) original = original.slice(0,-2)+"ió";
-        else original += "ó";
-    }
-    else if (tiempo === "futuro"){
-        original += "á";
-    }
-
-    return original + puntuacion;
+    salida.value=resultado;
 }
 
 function aEspanol(){
-    let texto = document.getElementById("entrada").value.toLowerCase();
+    let texto=entrada.value.toLowerCase();
+    let esPregunta=texto.startsWith("et-")&&texto.endsWith("-te");
 
-    let esPregunta = texto.startsWith("Et-") && texto.endsWith("-te");
+    texto=texto.replace("et-","").replace("-te","");
 
-    texto = texto.replace("et-","").replace("-te","");
+    let resultado=texto.split(" ").map(p=>{
+        if(preguntasInv[p]) return preguntasInv[p];
 
-    let palabras = texto.split(/\s+/);
-    let resultado = palabras.map(p => traducirPalabraEspanol(p)).join(" ");
+        return [...p].map(revertirLetra).join("");
+    }).join(" ");
 
-    if (esPregunta) resultado = "¿" + resultado + "?";
+    if(esPregunta) resultado="¿"+resultado+"?";
 
-    document.getElementById("salida").value = resultado;
-    animarSalida();
+    salida.value=resultado;
 }
 
 // =======================
-// ⚡ AUTOMÁTICO REAL
+// ⚡ AUTO
 // =======================
 function traducirAutomatico(){
-    let texto = document.getElementById("entrada").value;
+    let idioma=detectarIdioma(entrada.value);
 
-    let idioma = detectarIdioma(texto);
-
-    if(idioma === "isereop"){
+    if(idioma==="isereop"){
         aEspanol();
-    } else {
+    }else{
         aReina();
     }
 }
@@ -382,45 +206,29 @@ function traducirAutomatico(){
 // 🔧 EXTRA
 // =======================
 function copiar(){
-    let texto = document.getElementById("salida");
-    texto.select();
+    salida.select();
     document.execCommand("copy");
 }
 
 function limpiar(){
-    document.getElementById("entrada").value = "";
-    document.getElementById("salida").value = "";
+    entrada.value="";
+    salida.value="";
 }
 
-function toggleModo(){
-    document.body.classList.toggle("light");
-}
-
-function animarSalida(){
-    let salida = document.getElementById("salida");
-    salida.classList.add("loading");
-
-    setTimeout(()=>{
-        salida.classList.remove("loading");
-    }, 600);
-}
-
-// 🔁 BOTÓN INVERTIR (ahora solo intercambia texto)
 function invertir(){
-    let entrada = document.getElementById("entrada");
-    let salida = document.getElementById("salida");
-
-    let temp = entrada.value;
-    entrada.value = salida.value;
-    salida.value = temp;
-
+    let t=entrada.value;
+    entrada.value=salida.value;
+    salida.value=t;
     traducirAutomatico();
 }
 
-// AUTO
-document.getElementById("entrada").addEventListener("input", traducirAutomatico);
+// =======================
+// 🚀 TIEMPO REAL
+// =======================
+entrada.addEventListener("input", traducirAutomatico);
 
 </script>
-    
+
+</div>
 </body>
 </html>
