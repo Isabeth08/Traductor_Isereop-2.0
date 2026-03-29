@@ -155,14 +155,14 @@ button:hover {
 function detectarIdioma(texto){
     texto = texto.toLowerCase().trim();
 
-    if(texto.startsWith("et-") && texto.endsWith("-te")){
+    if(texto.startsWith("Et-") && texto.endsWith("-te")){
         return "isereop";
     }
 
     let palabras = texto.split(/\s+/);
 
     let comunesES = ["el","la","los","las","un","una","de","que","y","en","a","es","no","se","por","con","su","para","como"];
-    let patronRaro = /[ⱥɇɨøʉɏåe̊i̊o̊ůẙŷ̂]/;
+    let patronRaro = /[ⱥɇɨøʉɏåe̊i̊o̊ůẙŷ]/;
 
     let score = 0;
 
@@ -180,6 +180,29 @@ function detectarIdioma(texto){
 // =======================
 const vocales = "aeiouy";
 const consonantes = "bcdfghjklmnpqrstvwxyz";
+    
+const diccionario = {
+    "esta":"itve",
+    "ahi":"ejǫ",
+    "aqui":"eryǫ",
+    "alguien":"emhyoip",
+    "confianza":"dupgoepbe",
+    "mas":"nęt",
+    "alice":"alice",
+    "lucifer":"lucifer",
+    "dios":"dios",
+    "pingüino":"qophÿopu",
+    "vergüenza":"wishÿipbe",
+    "antigüedad":"epsohÿifef"
+};
+const preguntas = {
+    "quien":"rŷoip",
+    "que":"rŷi",
+    "donde":"fûpfi",
+    "cuando":"dŷepfu",
+    "cual":"dŷem",
+    "como":"dûnu"
+};
 
 // =======================
 // 🔁 LETRAS
@@ -234,7 +257,7 @@ function aplicarFuturo(palabra){
 // =======================
 function traducirPalabraReina(palabra){
 
-    let match = palabra.match(/^([a-záéíóúñ]+)([^a-záéíóúñ]*)$/i);
+    let match = palabra.match(/^([a-záéíóúñ]+)([^a-záéíóú]*)$/i);
     let baseOriginal = match ? match[1] : palabra;
     let puntuacion = match ? match[2] : "";
 
@@ -327,7 +350,7 @@ function traducirPalabraEspanol(palabra){
 function aEspanol(){
     let texto = document.getElementById("entrada").value.toLowerCase();
 
-    let esPregunta = texto.startsWith("et-") && texto.endsWith("-te");
+    let esPregunta = texto.startsWith("Et-") && texto.endsWith("-te");
 
     texto = texto.replace("et-","").replace("-te","");
 
@@ -398,5 +421,6 @@ function invertir(){
 document.getElementById("entrada").addEventListener("input", traducirAutomatico);
 
 </script>
+    
 </body>
 </html>
