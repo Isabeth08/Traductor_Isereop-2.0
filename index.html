@@ -41,9 +41,13 @@ textarea {
     background: #121212;
     color: #e0e0e0;
 }
+#salida {
+        margin-top: 15px;   
+    }
 .botones {
     display: flex;
     gap: 10px;
+    margin-top: 10px; /* 🔥 ESTO */
 }
 button {
     flex: 1;
@@ -81,6 +85,19 @@ button:hover {
   right: 0;
   bottom: 0;
   transition: 0.4s;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
 }
 
 .slider:before {
@@ -123,6 +140,11 @@ input:checked + .slider:before {
     color: black;
 }
 
+.light select {
+    background: #e0e0e0;
+    color: black;
+}
+
 /* Textareas */
 .light textarea {
     background: #f0f0f0;
@@ -150,8 +172,13 @@ input:checked + .slider:before {
 
 <textarea id="entrada" placeholder="Escribe aquí..."></textarea>
 
+<select id="modo">
+  <option value="reina">Español → Isereop</option>
+  <option value="espanol">Isereop → Español</option>
+</select>
+
 <div class="botones">
-<button onclick="invertir()">Isereop ↔ Español</button>
+<button onclick="invertir()">Invertir</button>
 <button onclick="copiar()">Copiar</button>
 <button onclick="limpiar()">Limpiar</button>
 <label class="switch">
@@ -164,43 +191,15 @@ input:checked + .slider:before {
 
 <script>
 
-// =======================
-// 🔥 DETECTOR INTELIGENTE
-// =======================
-function detectarIdioma(texto){
-    texto = texto.toLowerCase().trim();
+const entrada = document.getElementById("entrada");
+const salida = document.getElementById("salida");
 
-    if(texto.startsWith("et-") && texto.endsWith("-te")){
-        return "isereop";
-    }
-
-    let palabras = texto.split(/\s+/);
-
-    let comunesES = ["el","la","de","que","y","en","a","es","no","mi","tu","yo","pero","como","para"];
-    let raro = /[ⱥɇɨøʉɏåŷ]/;
-
-    let scoreIsereop = 0;
-    let scoreEspanol = 0;
-
-    palabras.forEach(p=>{
-        if(raro.test(p)) scoreIsereop += 3;
-        if(/(qy|ry|dy|ou|iw)/.test(p)) scoreIsereop += 1;
-
-        if(comunesES.includes(p)) scoreEspanol += 2;
-    });
-
-    // 🔥 DECISIÓN
-    if(scoreIsereop > scoreEspanol){
-        return "isereop";
-    } else {
-        return "espanol";
-    }
-}
+let ultimoModo = "reina"; 
 
 // =======================
 // 🔤 BASE
 // =======================
-const vocales="aeiouy";
+const vocales="aeiou";
 const consonantes="bcdfghjklmnpqrstvwxyz";
 
 // =======================
@@ -218,7 +217,8 @@ const diccionario={
     "dios":"dios",
     "pingüino":"qophÿopu",
     "vergüenza":"wishÿipbe",
-    "antigüedad":"epsohÿifef"
+    "antigüedad":"epsohÿifef",
+    "yo":"zu"
 };
 
 // =======================
@@ -237,6 +237,27 @@ const preguntasInv=Object.fromEntries(
     Object.entries(preguntas).map(([k,v])=>[v,k])
 );
 
+function esVocal(letra, palabra, i){
+    letra = letra.toLowerCase();
+
+    if("aeiou".includes(letra)) return true;
+
+    if(letra === "y"){
+        let antes = (palabra[i-1] || "").toLowerCase();
+        let despues = (palabra[i+1] || "").toLowerCase();
+
+        // 🔥 CASOS DONDE "y" SUENA COMO "i" (vocal)
+        if(i === palabra.length - 1) return true; // final: "hoy"
+        if("aeiou".includes(antes)) return true; // "ay", "ey"
+        if(!"aeiou".includes(antes) && !"aeiou".includes(despues)) return true; // sola
+
+        // 🔥 CASOS CONSONANTE (sonido "ye")
+        return false;
+    }
+
+    return false;
+}
+
 // =======================
 // ⏳ TIEMPOS
 // =======================
@@ -249,15 +270,23 @@ const futuroInv={"å":"a","e̊":"e","i̊":"i","o̊":"o","ů":"u","ẙ":"y"};
 // =======================
 // 🔁 LETRAS
 // =======================
-function moverLetra(l){
-    if(vocales.includes(l)) return vocales[(vocales.indexOf(l)+1)%6];
-    if(consonantes.includes(l)) return consonantes[(consonantes.indexOf(l)+1)%21];
+function moverLetra(l, palabra, i){
+    if(esVocal(l, palabra, i)){
+        return vocales[(vocales.indexOf(l)+1)%5];
+    }
+    if(consonantes.includes(l)){
+        return consonantes[(consonantes.indexOf(l)+1)%21];
+    }
     return l;
 }
 
-function revertirLetra(l){
-    if(vocales.includes(l)) return vocales[(vocales.indexOf(l)-1+6)%6];
-    if(consonantes.includes(l)) return consonantes[(consonantes.indexOf(l)-1+21)%21];
+function revertirLetra(l, palabra, i){
+    if(esVocal(l, palabra, i)){
+        return vocales[(vocales.indexOf(l)-1+5)%5];
+    }
+    if(consonantes.includes(l)){
+        return consonantes[(consonantes.indexOf(l)-1+21)%21];
+    }
     return l;
 }
 
@@ -265,6 +294,7 @@ function revertirLetra(l){
 // 👑 TRADUCIR
 // =======================
 function aReina(){
+        ultimoModo = "reina";
     let texto=entrada.value.toLowerCase();
     let esPregunta=texto.startsWith("¿")&&texto.endsWith("?");
 
@@ -274,7 +304,7 @@ function aReina(){
         if(diccionario[p]) return diccionario[p];
         if(preguntas[p]) return preguntas[p];
 
-        return [...p].map(moverLetra).join("");
+        return [...p].map((l,i)=>moverLetra(l,p,i)).join("");
     }).join(" ");
 
     if(esPregunta) resultado="Et-"+resultado+"-te";
@@ -283,6 +313,7 @@ function aReina(){
 }
 
 function aEspanol(){
+        ultimoModo = "espanol";
     let texto=entrada.value.toLowerCase();
     let esPregunta=texto.startsWith("et-")&&texto.endsWith("-te");
 
@@ -291,25 +322,12 @@ function aEspanol(){
     let resultado=texto.split(" ").map(p=>{
         if(preguntasInv[p]) return preguntasInv[p];
 
-        return [...p].map(revertirLetra).join("");
+        return [...p].map((l,i)=>revertirLetra(l,p,i)).join("");
     }).join(" ");
 
     if(esPregunta) resultado="¿"+resultado+"?";
 
     salida.value=resultado;
-}
-
-// =======================
-// ⚡ AUTO
-// =======================
-function traducirAutomatico(){
-    let idioma=detectarIdioma(entrada.value);
-
-    if(idioma==="isereop"){
-        aEspanol();
-    }else{
-        aReina();
-    }
 }
 
 // =======================
@@ -330,9 +348,14 @@ function invertir(){
     entrada.value = salida.value;
     salida.value = t;
 
-    // 🔥 SOLO traducir si hay texto
-    if(entrada.value.trim() !== ""){
-        traducirAutomatico();
+    if(entrada.value.trim() === "") return;
+
+    if(ultimoModo === "reina"){
+        document.getElementById("modo").value = "espanol";
+        aEspanol();
+    } else {
+        document.getElementById("modo").value = "reina";
+        aReina();
     }
 }
 
@@ -346,10 +369,17 @@ function toggleModo(){
     }
 }
 
-// =======================
-// 🚀 TIEMPO REAL
-// =======================
-entrada.addEventListener("input", traducirAutomatico);
+function traducir(){
+    let modo = document.getElementById("modo").value;
+
+    ultimoModo = modo; // 🔥 ESTA LÍNEA ES LA CLAVE
+
+    if(modo === "reina"){
+        aReina();
+    } else {
+        aEspanol();
+    }
+}
 
 // 🔄 Cargar modo guardado
 window.onload = function(){
@@ -358,6 +388,15 @@ window.onload = function(){
         document.getElementById("modoToggle").checked = true;
     }
 }
+
+entrada.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && !e.shiftKey){
+        e.preventDefault(); // ❌ evita salto de línea
+        traducir(); // ✅ ejecuta traducción
+    }
+});
+
+document.getElementById("modo").addEventListener("change", traducir);
 
 </script>
 
